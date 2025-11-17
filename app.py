@@ -1,14 +1,13 @@
-"""Importing necessary libraries"""
+# Importing necessary libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 from shiny import App, render, ui, reactive
 
-"""Loading and preprocess the attendance data"""
+# Loading and preprocess the attendance data
 shiny_df = pd.read_csv('cleaned_attendance_data.csv')
-# This line was fixed (removed leading space)
 module_list = shiny_df['Module Name'].unique().tolist()
 
-"""Defining the UI for the Shiny app in sidebar layout"""
+# Defining the UI for the Shiny app in sidebar layout
 app_ui = ui.page_sidebar(
     ui.sidebar(
         ui.input_select(
@@ -20,7 +19,7 @@ app_ui = ui.page_sidebar(
         title="Controls",
     ),
 
-"""Main analysis section with value boxes and plot output"""
+    # Main analysis section with value boxes and plot output
     ui.h2("Attendance Analysis"),
 
     ui.layout_columns(
@@ -32,33 +31,34 @@ app_ui = ui.page_sidebar(
             "Std. Deviation",
             ui.output_text("std_attendance_output"),
         )
-    ),
+    ),  # The comma here is also necessary
 
     ui.output_plot("attendance_plot")
 )
 
-"""Defining the server logic for the Shiny app"""
+# Defining the server logic for the Shiny app
 def server(input, output, session):
-    """Reactive expression to filter data based on selected module"""
+
+    # Reactive expression to filter data based on selected module
     @reactive.Calc
     def filtered_data():
         return shiny_df[shiny_df['Module Name'] == input.module_select()]
     
-    """Outputting mean attendance"""
+    # Outputting mean attendance
     @output
     @render.text
     def mean_attendance_output():
         mean_val = filtered_data()['Student Overall Attendance'].mean()
         return f"{mean_val:.2f}"
     
-    """Outputting standard deviation of attendance"""
+    # Outputting standard deviation of attendance
     @output
     @render.text
     def std_attendance_output():
         std_val = filtered_data()['Student Overall Attendance'].std()
         return f"{std_val:.2f}"
     
-    """Rendering plot with filtered data"""
+    # Rendering plot with filtered data
     @output
     @render.plot
     def attendance_plot():
